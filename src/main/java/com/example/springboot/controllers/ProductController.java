@@ -33,7 +33,12 @@ public class ProductController {
 
     @GetMapping("/products")
     public ResponseEntity<Page<ProductModel>> getAllProducts(@PageableDefault(page = 0, size = 10)Pageable pageable){
-        return ResponseEntity.status(HttpStatus.OK).body(productRepository.findAll(pageable));
+        Page<ProductModel> productModelPage = productRepository.findAll(pageable);
+        for(ProductModel productModel : productModelPage.getContent()){
+            UUID id = productModel.getIdProduct();
+            productModel.add(linkTo(methodOn(ProductController.class).getOneProduct(id)).withSelfRel());
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(productModelPage);
     }
 
     @GetMapping("/products/{id}")
