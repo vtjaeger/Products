@@ -9,5 +9,6 @@ public record ProductDto(
         @NotBlank
         String name,
         @NotNull
-        BigDecimal value) {
+        BigDecimal value,
+        String brand) {
 }

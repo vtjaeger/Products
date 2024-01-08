@@ -18,6 +18,9 @@ public class ProductModel extends RepresentationModel<ProductModel> implements S
     private UUID idProduct;
     private String name;
     private BigDecimal value;
+    @ManyToOne
+    @JoinColumn(name = "brand_id", referencedColumnName = "idBrand")
+    private BrandModel brand;
 
     public UUID getIdProduct() {
         return idProduct;
@@ -41,5 +44,13 @@ public class ProductModel extends RepresentationModel<ProductModel> implements S
 
     public void setValue(BigDecimal value) {
         this.value = value;
+    }
+
+    public BrandModel getBrand() {
+        return brand;
+    }
+
+    public void setBrand(BrandModel brand) {
+        this.brand = brand;
     }
 }

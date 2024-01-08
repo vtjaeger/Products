@@ -1,7 +1,10 @@
 package com.example.springboot.controllers;
 
+import com.example.springboot.dtos.BrandDto;
 import com.example.springboot.dtos.ProductDto;
+import com.example.springboot.models.BrandModel;
 import com.example.springboot.models.ProductModel;
+import com.example.springboot.repositories.BrandRepository;
 import com.example.springboot.repositories.ProductRepository;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
@@ -23,10 +26,22 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 public class ProductController {
     @Autowired
     ProductRepository productRepository;
+    @Autowired
+    BrandRepository brandRepository;
 
     @PostMapping("/products")
     public ResponseEntity<ProductModel> saveProduct(@RequestBody @Valid ProductDto productDto){
         var productModel = new ProductModel();
+
+        String brandName = productDto.brand();
+        BrandModel existingBrand = brandRepository.findByName(brandName);
+        if(existingBrand == null){
+            BrandModel brandModel = new BrandModel(brandName);
+            brandModel = brandRepository.save(brandModel);
+            productModel.setBrand(brandModel);
+        } else {
+            productModel.setBrand(existingBrand);
+        }
         BeanUtils.copyProperties(productDto, productModel);
         return ResponseEntity.status(HttpStatus.CREATED).body(productRepository.save(productModel));
     }
@@ -59,7 +74,17 @@ public class ProductController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Product not found");
         }
         var productModel = productModelOptional.get();
+
+        String brandName = productDto.brand();
+        BrandModel brandModel  = brandRepository.findByName(brandName);
+
+        if (brandModel == null) {
+            brandModel = new BrandModel(brandName);
+            brandModel = brandRepository.save(brandModel);
+        }
+
         BeanUtils.copyProperties(productDto, productModel);
+        productModel.setBrand(brandModel);
         return ResponseEntity.status(HttpStatus.OK).body(productRepository.save(productModel));
     }
 
