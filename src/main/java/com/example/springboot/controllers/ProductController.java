@@ -36,7 +36,7 @@ public class ProductController {
         BrandModel existingBrand = brandRepository.findByName(brandName);
         if(existingBrand == null){
             BrandModel brandModel = new BrandModel(brandName);
-            brandModel = brandRepository.save(brandModel);
+            brandRepository.save(brandModel);
             productModel.setBrand(brandModel);
         } else {
             productModel.setBrand(existingBrand);
