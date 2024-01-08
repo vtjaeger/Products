@@ -1,15 +1,14 @@
 package com.example.springboot.controllers;
 
-import com.example.springboot.dtos.BrandDto;
 import com.example.springboot.dtos.ProductDto;
 import com.example.springboot.models.BrandModel;
 import com.example.springboot.models.ProductModel;
 import com.example.springboot.repositories.BrandRepository;
 import com.example.springboot.repositories.ProductRepository;
 import jakarta.validation.Valid;
-import org.springframework.data.domain.Page;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
