@@ -59,8 +59,6 @@ public class BrandController {
             UUID productID = product.getIdProduct();
             product.add(linkTo(methodOn(ProductController.class).getOneProduct(productID)).withSelfRel());
         }
-
         return ResponseEntity.status(HttpStatus.OK).body(products);
     }
-
 }

@@ -5,6 +5,7 @@ import com.example.springboot.models.BrandModel;
 import com.example.springboot.models.ProductModel;
 import com.example.springboot.repositories.BrandRepository;
 import com.example.springboot.repositories.ProductRepository;
+import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +30,7 @@ public class ProductController {
     BrandRepository brandRepository;
 
     @PostMapping("/products")
+    @Transactional
     public ResponseEntity<ProductModel> saveProduct(@RequestBody @Valid ProductDto productDto){
         var productModel = new ProductModel();
 
@@ -40,6 +42,7 @@ public class ProductController {
             productModel.setBrand(brandModel);
         } else {
             productModel.setBrand(existingBrand);
+
         }
         BeanUtils.copyProperties(productDto, productModel);
         return ResponseEntity.status(HttpStatus.CREATED).body(productRepository.save(productModel));
@@ -66,6 +69,7 @@ public class ProductController {
     }
 
     @PutMapping("/products/{id}")
+    @Transactional
     public ResponseEntity<Object> updateProduct(@PathVariable(value = "id") UUID id,
                                                 @RequestBody @Valid ProductDto productDto){
         Optional<ProductModel> productModelOptional = productRepository.findById(id);
@@ -88,6 +92,7 @@ public class ProductController {
     }
 
     @DeleteMapping("/products/{id}")
+    @Transactional
     public ResponseEntity<Object> deleteProduct(@PathVariable(value = "id") UUID id){
         Optional<ProductModel> productModelOptional = productRepository.findById(id);
         if(productModelOptional.isEmpty()){

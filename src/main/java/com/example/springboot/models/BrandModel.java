@@ -17,7 +17,7 @@ public class BrandModel implements Serializable {
     private UUID idBrand;
     private String name;
     @OneToMany(mappedBy = "brand", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ProductModel> product;
+    private List<ProductModel> products;
     public BrandModel() {
     }
 
