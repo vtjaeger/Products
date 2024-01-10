@@ -10,14 +10,17 @@ import jakarta.validation.Valid;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
@@ -53,11 +56,19 @@ public class ProductController {
     @GetMapping("/products")
     public ResponseEntity<Page<ProductModel>> getAllProducts(@PageableDefault(page = 0, size = 10)Pageable pageable){
         Page<ProductModel> productModelPage = productRepository.findAll(pageable);
-        for(ProductModel productModel : productModelPage.getContent()){
+
+        List<ProductModel> filteredProducts = productModelPage.getContent()
+                .stream()
+                .filter(p -> p.getBrand().getActive() != null && p.getBrand().getActive())
+                .collect(Collectors.toList());
+
+        Page<ProductModel> filteredPage = new PageImpl<>(filteredProducts, pageable, filteredProducts.size());
+
+        for (ProductModel productModel : productModelPage.getContent()) {
             UUID id = productModel.getIdProduct();
             productModel.add(linkTo(methodOn(ProductController.class).getOneProduct(id)).withSelfRel());
         }
-        return ResponseEntity.status(HttpStatus.OK).body(productModelPage);
+        return ResponseEntity.status(HttpStatus.OK).body(filteredPage);
     }
 
     @GetMapping("/products/{id}")
@@ -94,7 +105,6 @@ public class ProductController {
     }
 
     @DeleteMapping("/products/{id}")
-    @Transactional
     public ResponseEntity<Object> deleteProduct(@PathVariable(value = "id") UUID id){
         Optional<ProductModel> productModelOptional = productRepository.findById(id);
         if(productModelOptional.isEmpty()){
