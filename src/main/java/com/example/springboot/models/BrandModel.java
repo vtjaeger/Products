@@ -4,8 +4,6 @@ import jakarta.persistence.*;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -49,10 +47,10 @@ public class BrandModel implements Serializable {
         this.active = active;
     }
 
-    public void ativar(){
+    public void active(){
         this.active = true;
     }
-    public void disativar(){
+    public void inactive(){
         this.active = false;
     }
 }

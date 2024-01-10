@@ -18,6 +18,7 @@ public class ProductModel extends RepresentationModel<ProductModel> implements S
     private UUID idProduct;
     private String name;
     private BigDecimal value;
+    private Boolean active = true;
     @ManyToOne
     @JoinColumn(name = "brand_id", referencedColumnName = "idBrand")
     private BrandModel brand;
@@ -46,11 +47,26 @@ public class ProductModel extends RepresentationModel<ProductModel> implements S
         this.value = value;
     }
 
+    public Boolean getActive() {
+        return active;
+    }
+
+    public void setActive(Boolean active) {
+        this.active = active;
+    }
+
     public BrandModel getBrand() {
         return brand;
     }
 
     public void setBrand(BrandModel brand) {
         this.brand = brand;
+    }
+
+    public void active(){
+        this.active = true;
+    }
+    public void disable(){
+        this.active = false;
     }
 }

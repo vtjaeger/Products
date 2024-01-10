@@ -77,15 +77,15 @@ public class BrandController {
 
     @PatchMapping("/{id}")
     @Transactional
-    public ResponseEntity<Object> activeOrDisableBrand(@PathVariable("id") UUID id){
+    public ResponseEntity<Object> activeOrInactive(@PathVariable("id") UUID id){
         var brand = brandRepository.getReferenceById(id);
         String statusMessage;
 
         if(brand.getActive()){
-            brand.disativar();
-            statusMessage = " is now disable";
+            brand.inactive();
+            statusMessage = " is now inactive";
         } else {
-            brand.ativar();
+            brand.active();
             statusMessage = " is now active";
         }
         return ResponseEntity.status(HttpStatus.OK).body(brand.getName() + statusMessage);

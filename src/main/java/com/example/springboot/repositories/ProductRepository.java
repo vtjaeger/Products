@@ -2,6 +2,8 @@ package com.example.springboot.repositories;
 
 import com.example.springboot.models.BrandModel;
 import com.example.springboot.models.ProductModel;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -11,4 +13,6 @@ import java.util.UUID;
 @Repository
 public interface ProductRepository extends JpaRepository<ProductModel, UUID> {
     List<ProductModel> findByBrand(BrandModel brand);
+
+    Page<ProductModel> findByActiveTrue(Pageable pageable);
 }

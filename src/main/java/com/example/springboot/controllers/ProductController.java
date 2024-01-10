@@ -55,20 +55,13 @@ public class ProductController {
 
     @GetMapping("/products")
     public ResponseEntity<Page<ProductModel>> getAllProducts(@PageableDefault(page = 0, size = 10)Pageable pageable){
-        Page<ProductModel> productModelPage = productRepository.findAll(pageable);
-
-        List<ProductModel> filteredProducts = productModelPage.getContent()
-                .stream()
-                .filter(p -> p.getBrand().getActive() != null && p.getBrand().getActive())
-                .collect(Collectors.toList());
-
-        Page<ProductModel> filteredPage = new PageImpl<>(filteredProducts, pageable, filteredProducts.size());
+        Page<ProductModel> productModelPage = productRepository.findByActiveTrue(pageable);
 
         for (ProductModel productModel : productModelPage.getContent()) {
             UUID id = productModel.getIdProduct();
             productModel.add(linkTo(methodOn(ProductController.class).getOneProduct(id)).withSelfRel());
         }
-        return ResponseEntity.status(HttpStatus.OK).body(filteredPage);
+        return ResponseEntity.status(HttpStatus.OK).body(productModelPage);
     }
 
     @GetMapping("/products/{id}")
@@ -104,13 +97,24 @@ public class ProductController {
         return ResponseEntity.status(HttpStatus.OK).body(productRepository.save(productModel));
     }
 
-    @DeleteMapping("/products/{id}")
-    public ResponseEntity<Object> deleteProduct(@PathVariable(value = "id") UUID id){
+    @PatchMapping("/products/{id}")
+    @Transactional
+    public ResponseEntity<Object> activeOrInactiveProduct(@PathVariable(value = "id") UUID id){
         Optional<ProductModel> productModelOptional = productRepository.findById(id);
         if(productModelOptional.isEmpty()){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Product not found");
         }
-        productRepository.delete(productModelOptional.get());
-        return ResponseEntity.status(HttpStatus.OK).body("Product deleted successfully");
+
+        ProductModel productModel = productModelOptional.get();
+        String statusMessage;
+        if(productModel.getActive()){
+            productModel.disable();
+            statusMessage = " is now inactive";
+        } else {
+            productModel.active();
+            statusMessage = " is now active";
+        }
+
+        return ResponseEntity.status(HttpStatus.OK).body(productModel.getName() + statusMessage);
     }
 }
