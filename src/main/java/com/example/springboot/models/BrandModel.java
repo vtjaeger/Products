@@ -17,8 +17,6 @@ public class BrandModel implements Serializable {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID idBrand;
     private String name;
-    @OneToMany(mappedBy = "brand", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ProductModel> produtos;
 
     public BrandModel(String name) {
         this.name = name;
