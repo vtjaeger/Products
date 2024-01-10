@@ -17,7 +17,7 @@ public class BrandModel implements Serializable {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID idBrand;
     private String name;
-
+    private Boolean active = true;
     public BrandModel(String name) {
         this.name = name;
     }
@@ -41,4 +41,18 @@ public class BrandModel implements Serializable {
         this.name = name;
     }
 
+    public Boolean getActive() {
+        return active;
+    }
+
+    public void setActive(Boolean active) {
+        this.active = active;
+    }
+
+    public void ativar(){
+        this.active = true;
+    }
+    public void disativar(){
+        this.active = false;
+    }
 }
