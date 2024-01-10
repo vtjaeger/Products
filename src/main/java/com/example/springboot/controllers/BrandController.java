@@ -29,8 +29,14 @@ public class BrandController {
     @Autowired
     ProductRepository productRepository;
     @GetMapping
-    public ResponseEntity<Page<BrandModel>> getAllBrands(@PageableDefault(page = 0, size = 10, sort = "name") Pageable pageable){
+    public ResponseEntity<Page<BrandModel>> getBrandsActive(@PageableDefault(page = 0, size = 10, sort = "name") Pageable pageable){
         Page<BrandModel> brandModelPage = brandRepository.findByActiveTrue(pageable);
+        return ResponseEntity.status(HttpStatus.OK).body(brandModelPage);
+    }
+
+    @GetMapping("/all")
+    public ResponseEntity<Page<BrandModel>> getAllBrands(@PageableDefault(page = 0, size = 10, sort = "name") Pageable pageable){
+        Page<BrandModel> brandModelPage = brandRepository.findAll(pageable);
         return ResponseEntity.status(HttpStatus.OK).body(brandModelPage);
     }
 

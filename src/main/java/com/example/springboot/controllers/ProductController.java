@@ -54,7 +54,7 @@ public class ProductController {
     }
 
     @GetMapping("/products")
-    public ResponseEntity<Page<ProductModel>> getAllProducts(@PageableDefault(page = 0, size = 10)Pageable pageable){
+    public ResponseEntity<Page<ProductModel>> getProductsActive(@PageableDefault(page = 0, size = 10)Pageable pageable){
         Page<ProductModel> productModelPage = productRepository.findByActiveTrue(pageable);
 
         for (ProductModel productModel : productModelPage.getContent()) {
@@ -64,13 +64,23 @@ public class ProductController {
         return ResponseEntity.status(HttpStatus.OK).body(productModelPage);
     }
 
+    @GetMapping("/products/all")
+    public ResponseEntity<Object> getAllProducts(@PageableDefault(page = 0, size = 10)Pageable pageable){
+        Page<ProductModel> productModelPage = productRepository.findAll(pageable);
+
+        for (ProductModel productModel : productModelPage.getContent()) {
+            UUID id = productModel.getIdProduct();
+            productModel.add(linkTo(methodOn(ProductController.class).getOneProduct(id)).withSelfRel());
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(productModelPage);
+    }
     @GetMapping("/products/{id}")
     public ResponseEntity<Object> getOneProduct(@PathVariable(value = "id")UUID id){
         Optional<ProductModel> productModelOptional = productRepository.findById(id);
         if(productModelOptional.isEmpty()){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Product not found");
         }
-        productModelOptional.get().add(linkTo(methodOn(ProductController.class).getAllProducts(Pageable.unpaged())).withSelfRel());
+        productModelOptional.get().add(linkTo(methodOn(ProductController.class).getProductsActive(Pageable.unpaged())).withSelfRel());
         return ResponseEntity.status(HttpStatus.OK).body(productModelOptional.get());
     }
 
