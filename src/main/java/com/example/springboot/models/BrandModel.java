@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -17,12 +18,13 @@ public class BrandModel implements Serializable {
     private UUID idBrand;
     private String name;
     @OneToMany(mappedBy = "brand", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ProductModel> products;
-    public BrandModel() {
-    }
+    private List<ProductModel> produtos;
 
     public BrandModel(String name) {
         this.name = name;
+    }
+
+    public BrandModel() {
     }
 
     public UUID getIdBrand() {
@@ -40,4 +42,5 @@ public class BrandModel implements Serializable {
     public void setName(String name) {
         this.name = name;
     }
+
 }

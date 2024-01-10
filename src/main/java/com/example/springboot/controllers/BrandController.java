@@ -10,10 +10,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Collections;
 import java.util.List;
@@ -42,6 +39,7 @@ public class BrandController {
         if(brandModelOptional.isEmpty()){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Brand not found");
         }
+
         var brandModel = brandModelOptional.get();
         return ResponseEntity.status(HttpStatus.OK).body(brandModel);
     }
@@ -60,5 +58,20 @@ public class BrandController {
             product.add(linkTo(methodOn(ProductController.class).getOneProduct(productID)).withSelfRel());
         }
         return ResponseEntity.status(HttpStatus.OK).body(products);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Object> deleteBrand(@PathVariable(value = "id") UUID id){
+        Optional<BrandModel> brandModelOptional = brandRepository.findById(id);
+        if (brandModelOptional.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Brand not found");
+        }
+        BrandModel brandModel = brandModelOptional.get();
+        List<ProductModel> products = productRepository.findByBrand(brandModel);
+
+        for(ProductModel product : products){
+            product.setBrand(null);
+        }
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }

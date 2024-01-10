@@ -36,15 +36,17 @@ public class ProductController {
 
         String brandName = productDto.brand();
         BrandModel existingBrand = brandRepository.findByName(brandName);
-        if(existingBrand == null){
+
+        if (existingBrand == null) {
             BrandModel brandModel = new BrandModel(brandName);
             brandRepository.save(brandModel);
+
             productModel.setBrand(brandModel);
         } else {
             productModel.setBrand(existingBrand);
-
         }
         BeanUtils.copyProperties(productDto, productModel);
+
         return ResponseEntity.status(HttpStatus.CREATED).body(productRepository.save(productModel));
     }
 
