@@ -95,18 +95,14 @@ public class ProductController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Product not found");
         }
         var productModel = productModelOptional.get();
-
-        String brandName = productDto.brand();
-        BrandModel brandModel  = brandRepository.findByName(brandName);
-
-        if (brandModel == null) {
-            brandModel = new BrandModel(brandName);
-            brandModel = brandRepository.save(brandModel);
-        }
+        var brand = brandService.getOrCreateBrand(productDto.brand());
 
         BeanUtils.copyProperties(productDto, productModel);
-        productModel.setBrand(brandModel);
-        return ResponseEntity.status(HttpStatus.OK).body(productRepository.save(productModel));
+        productModel.setBrand(brand);
+
+        ProductModel updatedProduct = productRepository.save(productModel);
+
+        return ResponseEntity.status(HttpStatus.OK).body(productRepository.save(updatedProduct));
     }
 
     @PatchMapping("/products/{id}")
