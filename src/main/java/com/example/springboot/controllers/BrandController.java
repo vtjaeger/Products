@@ -55,7 +55,8 @@ public class BrandController {
     public ResponseEntity<List<ProductModel>> getProductsByBrand(@PathVariable("id_brand") UUID brandId){
         Optional<BrandModel> brandModelOptional = brandRepository.findById(brandId);
         if(brandModelOptional.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Collections.emptyList());
+            return ResponseEntity.notFound().build();
+//            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Collections.emptyList());
         }
         BrandModel brandModel = brandModelOptional.get();
         List<ProductModel> products = productRepository.findByBrand(brandModel);
@@ -64,6 +65,11 @@ public class BrandController {
             UUID productID = product.getIdProduct();
             product.add(linkTo(methodOn(ProductController.class).getOneProduct(productID)).withSelfRel());
         }
+
+        //OUTRA FORMA
+        // List<ProductModel> products = productRepository.findByBrand(brandModel);
+        //products.forEach(product -> product.add(linkTo(methodOn(ProductController.class).getOneProduct(product.getIdProduct())).withSelfRel()));
+
         return ResponseEntity.status(HttpStatus.OK).body(products);
     }
 
