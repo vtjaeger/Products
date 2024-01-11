@@ -1,6 +1,5 @@
 package com.example.springboot.services;
 
-import com.example.springboot.dtos.BrandDto;
 import com.example.springboot.dtos.ProductDto;
 import com.example.springboot.models.BrandModel;
 import com.example.springboot.models.ProductModel;
