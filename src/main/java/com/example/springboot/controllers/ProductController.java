@@ -1,26 +1,27 @@
 package com.example.springboot.controllers;
 
+import com.example.springboot.dtos.BrandDto;
 import com.example.springboot.dtos.ProductDto;
+import com.example.springboot.dtos.SaveProductResponseDto;
 import com.example.springboot.models.BrandModel;
 import com.example.springboot.models.ProductModel;
 import com.example.springboot.repositories.BrandRepository;
 import com.example.springboot.repositories.ProductRepository;
+import com.example.springboot.services.BrandService;
+import com.example.springboot.services.ProductService;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
@@ -31,26 +32,27 @@ public class ProductController {
     ProductRepository productRepository;
     @Autowired
     BrandRepository brandRepository;
+    @Autowired
+    BrandService brandService;
+    @Autowired
+    ProductService productService;
 
     @PostMapping("/products")
     @Transactional
-    public ResponseEntity<ProductModel> saveProduct(@RequestBody @Valid ProductDto productDto){
-        var productModel = new ProductModel();
+    public ResponseEntity<SaveProductResponseDto> saveProduct(@RequestBody @Valid ProductDto productDto){
+        BrandModel existingBrand = brandService.getOrCreateBrand(productDto.brand());
+        ProductModel productModel = productService.createProductModel(productDto, existingBrand);
 
-        String brandName = productDto.brand();
-        BrandModel existingBrand = brandRepository.findByName(brandName);
+        ProductModel savedProduct = productRepository.save(productModel);
 
-        if (existingBrand == null) {
-            BrandModel brandModel = new BrandModel(brandName);
-            brandRepository.save(brandModel);
+        BrandDto brandDto = new BrandDto(productModel.getBrand().getIdBrand(), productModel.getBrand().getName());
 
-            productModel.setBrand(brandModel);
-        } else {
-            productModel.setBrand(existingBrand);
-        }
-        BeanUtils.copyProperties(productDto, productModel);
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(productRepository.save(productModel));
+        SaveProductResponseDto responseDto = new SaveProductResponseDto(savedProduct
+                .getIdProduct(),
+                savedProduct.getName(),
+                savedProduct.getValue(),
+                brandDto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
     }
 
     @GetMapping("/products")
