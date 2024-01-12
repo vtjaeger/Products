@@ -23,4 +23,13 @@ public class ProductService {
 
         return existingProduct;
     }
+
+    public ProductModel activeOrInactiveProduct(ProductModel productModel){
+        if(productModel.getActive()){
+            productModel.disable();
+        } else {
+            productModel.active();
+        }
+        return productModel;
+    }
 }

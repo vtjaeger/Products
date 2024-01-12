@@ -112,14 +112,23 @@ public class ProductController {
         }
 
         ProductModel productModel = productModelOptional.get();
+        var updatedProduct = productService.activeOrInactiveProduct(productModel);
+        productRepository.save(updatedProduct);
+
         String statusMessage;
+
+//          OUTRA FORMA
+//        String statusMessage = updatedProduct.getActive()
+//                ? " (" + updatedProduct.getBrand().getName() + ") is now active."
+//                : " (" + updatedProduct.getBrand().getName() + ") is now inactive.";
+
         if(productModel.getActive()){
             productModel.disable();
-            statusMessage = " (" + productModel.getBrand().getName() +  ") is now inactive.";
+            statusMessage = " (" + updatedProduct.getBrand().getName() +  ") is now inactive.";
         } else {
             productModel.active();
-            statusMessage = " (" + productModel.getBrand().getName() +  ") is now active.";
+            statusMessage = " (" + updatedProduct.getBrand().getName() +  ") is now active.";
         }
-        return ResponseEntity.status(HttpStatus.OK).body(productModel.getName() + statusMessage);
+        return ResponseEntity.status(HttpStatus.OK).body(updatedProduct.getName() + statusMessage);
     }
 }
