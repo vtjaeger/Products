@@ -94,13 +94,11 @@ public class ProductController {
         if(productModelOptional.isEmpty()){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Product not found");
         }
-        var productModel = productModelOptional.get();
+        var existingProduct = productModelOptional.get();
         var brand = brandService.getOrCreateBrand(productDto.brand());
 
-        BeanUtils.copyProperties(productDto, productModel);
-        productModel.setBrand(brand);
-
-        ProductModel updatedProduct = productRepository.save(productModel);
+        ProductModel updatedProduct = productService.updateProduct(existingProduct, productDto, brand);
+        productRepository.save(updatedProduct);
 
         return ResponseEntity.status(HttpStatus.OK).body(productRepository.save(updatedProduct));
     }
@@ -117,12 +115,11 @@ public class ProductController {
         String statusMessage;
         if(productModel.getActive()){
             productModel.disable();
-            statusMessage = " is now inactive";
+            statusMessage = " (" + productModel.getBrand().getName() +  ") is now inactive.";
         } else {
             productModel.active();
-            statusMessage = " is now active";
+            statusMessage = " (" + productModel.getBrand().getName() +  ") is now active.";
         }
-
         return ResponseEntity.status(HttpStatus.OK).body(productModel.getName() + statusMessage);
     }
 }

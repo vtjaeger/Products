@@ -15,4 +15,12 @@ public class ProductService {
         BeanUtils.copyProperties(productDto, productModel);
         return productModel;
     }
+
+    public ProductModel updateProduct(ProductModel existingProduct, ProductDto productDto, BrandModel brandModel){
+        existingProduct.setName(productDto.name());
+        existingProduct.setValue(productDto.value());
+        existingProduct.setBrand(brandModel);
+
+        return existingProduct;
+    }
 }
