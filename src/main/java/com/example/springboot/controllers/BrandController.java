@@ -1,11 +1,13 @@
 package com.example.springboot.controllers;
 
+import com.example.springboot.dtos.UpdateBrandDto;
 import com.example.springboot.exceptions.ResourceNotFoundException;
 import com.example.springboot.models.BrandModel;
 import com.example.springboot.models.ProductModel;
 import com.example.springboot.repositories.BrandRepository;
 import com.example.springboot.repositories.ProductRepository;
 import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -102,4 +104,19 @@ public class BrandController {
         }
         return ResponseEntity.status(HttpStatus.OK).body(brand.getName() + statusMessage);
     }
+
+    @PutMapping("/{id}")
+    @Transactional
+    public ResponseEntity<Object> updateBrand(@PathVariable("id") UUID id, @RequestBody @Valid UpdateBrandDto brandDto){
+        Optional<BrandModel> brandModelOptional = brandRepository.findById(id);
+        if(brandModelOptional.isEmpty()){
+            throw new ResourceNotFoundException(id, "Brand");
+        }
+        var existingBrand = brandModelOptional.get();
+        existingBrand.setName(brandDto.name());
+
+        brandRepository.save(existingBrand);
+        return ResponseEntity.status(HttpStatus.OK).body(existingBrand);
+    }
+
 }
