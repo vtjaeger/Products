@@ -1,5 +1,6 @@
 package com.example.springboot.controllers;
 
+import com.example.springboot.exceptions.BrandNotFoundException;
 import com.example.springboot.models.BrandModel;
 import com.example.springboot.models.ProductModel;
 import com.example.springboot.repositories.BrandRepository;
@@ -43,7 +44,7 @@ public class BrandController {
     public ResponseEntity<Object> getOneBrand(@PathVariable("id") UUID id){
         Optional<BrandModel> brandModelOptional = brandRepository.findById(id);
         if(brandModelOptional.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Brand not found");
+            throw new BrandNotFoundException(id);
         }
 
         var brandModel = brandModelOptional.get();
@@ -51,10 +52,10 @@ public class BrandController {
     }
 
     @GetMapping("{id_brand}/products")
-    public ResponseEntity<List<ProductModel>> getProductsByBrand(@PathVariable("id_brand") UUID brandId){
-        Optional<BrandModel> brandModelOptional = brandRepository.findById(brandId);
+    public ResponseEntity<List<ProductModel>> getProductsByBrand(@PathVariable("id_brand") UUID id){
+        Optional<BrandModel> brandModelOptional = brandRepository.findById(id);
         if(brandModelOptional.isEmpty()){
-            return ResponseEntity.notFound().build();
+            throw new BrandNotFoundException(id);
 //            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Collections.emptyList());
         }
         BrandModel brandModel = brandModelOptional.get();

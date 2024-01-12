@@ -3,6 +3,7 @@ package com.example.springboot.controllers;
 import com.example.springboot.dtos.BrandDto;
 import com.example.springboot.dtos.ProductDto;
 import com.example.springboot.dtos.SaveProductResponseDto;
+import com.example.springboot.exceptions.ProductNotFoundException;
 import com.example.springboot.models.BrandModel;
 import com.example.springboot.models.ProductModel;
 import com.example.springboot.repositories.BrandRepository;
@@ -80,7 +81,7 @@ public class ProductController {
     public ResponseEntity<Object> getOneProduct(@PathVariable(value = "id")UUID id){
         Optional<ProductModel> productModelOptional = productRepository.findById(id);
         if(productModelOptional.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Product not found");
+            throw new ProductNotFoundException(id);
         }
         productModelOptional.get().add(linkTo(methodOn(ProductController.class).getProductsActive(Pageable.unpaged())).withSelfRel());
         return ResponseEntity.status(HttpStatus.OK).body(productModelOptional.get());
