@@ -13,14 +13,9 @@ public class ExceptionsClass {
     public ResponseEntity<Object> handleInternalError(Exception e){
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erro interno no servidor.\n\n" + e.getMessage());
     }
-    @ExceptionHandler(ProductNotFoundException.class)
+    @ExceptionHandler(ResourceNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ResponseEntity<Object> productNotFoundException(ProductNotFoundException e){
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-    }
-    @ExceptionHandler(BrandNotFoundException.class)
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ResponseEntity<Object> brandNotFoundException(BrandNotFoundException e){
+    public ResponseEntity<Object> handleResourceNotFound(ResourceNotFoundException e){
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
     }
 }

@@ -3,7 +3,7 @@ package com.example.springboot.controllers;
 import com.example.springboot.dtos.BrandDto;
 import com.example.springboot.dtos.ProductDto;
 import com.example.springboot.dtos.SaveProductResponseDto;
-import com.example.springboot.exceptions.ProductNotFoundException;
+import com.example.springboot.exceptions.ResourceNotFoundException;
 import com.example.springboot.models.BrandModel;
 import com.example.springboot.models.ProductModel;
 import com.example.springboot.repositories.BrandRepository;
@@ -12,7 +12,6 @@ import com.example.springboot.services.BrandService;
 import com.example.springboot.services.ProductService;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -81,7 +80,7 @@ public class ProductController {
     public ResponseEntity<Object> getOneProduct(@PathVariable(value = "id")UUID id){
         Optional<ProductModel> productModelOptional = productRepository.findById(id);
         if(productModelOptional.isEmpty()){
-            throw new ProductNotFoundException(id);
+            throw new ResourceNotFoundException(id, "Product");
         }
         productModelOptional.get().add(linkTo(methodOn(ProductController.class).getProductsActive(Pageable.unpaged())).withSelfRel());
         return ResponseEntity.status(HttpStatus.OK).body(productModelOptional.get());
@@ -93,7 +92,7 @@ public class ProductController {
                                                 @RequestBody @Valid ProductDto productDto){
         Optional<ProductModel> productModelOptional = productRepository.findById(id);
         if(productModelOptional.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Product not found");
+            throw new ResourceNotFoundException(id, "Product");
         }
         var existingProduct = productModelOptional.get();
         var brand = brandService.getOrCreateBrand(productDto.brand());
@@ -109,7 +108,7 @@ public class ProductController {
     public ResponseEntity<Object> activeOrInactiveProduct(@PathVariable(value = "id") UUID id){
         Optional<ProductModel> productModelOptional = productRepository.findById(id);
         if(productModelOptional.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Product not found");
+            throw new ResourceNotFoundException(id, "Product");
         }
 
         ProductModel productModel = productModelOptional.get();
